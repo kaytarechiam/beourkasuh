@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Dulu Ya</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #fce4ec; /* Warna pink lembut */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff80ab; /* Warna pink lebih cerah */
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #f06292;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Panggilan Spesial Untukmu</h2>
+        <p>Masukkan panggilan spesialmu di sini ya</p>
+        <input type="text" id="nickname" placeholder="Ketik di sini...">
+        <button onclick="checkLogin()">Masuk</button>
+    </div>
+
+    <script>
+        function checkLogin() {
+            // Ganti "sayang" dengan password atau panggilan yang kamu mau
+            const correctNickname = "sayang";
+            const inputNickname = document.getElementById('nickname').value.toLowerCase();
+
+            if (inputNickname === correctNickname) {
+                // Jika benar, pindah ke halaman opening.html
+                window.location.href = "opening.html";
+            } else {
+                alert("Hmm, sepertinya panggilannya salah. Coba lagi ya!");
+            }
+        }
+    </script>
+
+</body>
+</html>

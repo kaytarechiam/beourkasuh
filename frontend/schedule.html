@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Jadwal</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #fce4ec;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input, select {
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff80ab;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #f06292;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Kapan Waktu Luangmu?</h2>
+        <label for="date">Pilih Tanggal:</label><br>
+        <input type="date" id="date" name="date"><br><br>
+
+        <label for="time">Pilih Jam:</label><br>
+        <select id="time" name="time">
+            <option value="pagi">Pagi (09:00 - 12:00)</option>
+            <option value="siang">Siang (13:00 - 16:00)</option>
+            <option value="malam">Malam (19:00 - 21:00)</option>
+        </select>
+        
+        <br>
+        <button onclick="goToAsk()">Sudah Pilih</button>
+    </div>
+
+    <script>
+        function goToAsk() {
+            // Pindah ke halaman ask.html
+            window.location.href = "ask.html";
+        }
+    </script>
+
+</body>
+</html>
