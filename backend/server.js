@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 // === ROUTE LOGIN (SUDAH ADA) ===
 app.post('/api/login', (req, res) => {
     const { panggilan } = req.body;
-    if (panggilan.toLowerCase() === 'sayang') { // Dibuat case-insensitive
+    if (panggilan.toLowerCase() === 'ciamoroll') { // Dibuat case-insensitive
         res.status(200).json({ success: true, message: 'Login berhasil!' });
     } else {
         res.status(401).json({ success: false, message: 'Panggilan salah!' });
