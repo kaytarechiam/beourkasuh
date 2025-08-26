@@ -52,17 +52,12 @@
         <p>Setelah kita kenal cukup lama, aku mau nanya sesuatu yang penting.</p>
         <h2>Mau jadi "Kasuh"-ku?</h2>
         <div class="button-group">
-            <button id="btn-ciw" onclick="thankYou()">Mau, jadi Kasuh-nya Ciw</button>
-            <button id="btn-kei" onclick="thankYou()">Mau, jadi Kasuh-nya Kei</button>
+            <button id="btn-ciw" onclick="kirimJawaban('Mau jadi Kasuh-nya Ciw')">Mau, jadi Kasuh-nya Ciw</button>
+            <button id="btn-kei" onclick="kirimJawaban('Mau jadi Kasuh-nya Kei')">Mau, jadi Kasuh-nya Kei</button>
         </div>
     </div>
 
-    <script>
-        function thankYou() {
-            // Pindah ke halaman thankyou.html
-            window.location.href = "thankyou.html";
-        }
-    </script>
+    <script src="ask.js"></script>
 
 </body>
 </html>
