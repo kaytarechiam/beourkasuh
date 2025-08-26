@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Tracking Jawaban</title>
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #e3f2fd; /* Warna biru muda */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 400px;
+        }
+        h1 {
+            color: #1e88e5;
+        }
+        #jawabanDisplay {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #555;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 30px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ef5350; /* Warna merah */
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Dashboard Tracking</h1>
+        <p>Status Jawaban dari Ka Cia rn:</p>
+        <div id="jawabanDisplay">Memuat jawaban...</div>
+        <button onclick="resetJawaban()">Kosongkan Jawaban (untuk Tes)</button>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
