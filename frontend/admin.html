@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <title>Admin Panel - Tracking Jawaban</title>
     <style>
-        /* (Salin style dari admin.html lama, atau kustomisasi sendiri) */
+        /* ... (style tidak berubah, atau sesuaikan sesukamu) ... */
         .profile-card { border: 1px solid #ddd; padding: 15px; margin-top: 20px; border-radius: 8px; }
         .profile-card h3 { margin-top: 0; }
+        .schedule-info { background-color: #e8f5e9; padding: 10px; border-radius: 5px; margin-top: 20px;}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Dashboard Tracking Jawaban Cia</h1>
+        
+        <div class="schedule-info">
+            <h3>Jadwal Janji Temu:</h3>
+            <p><strong>Tanggal:</strong> <span id="displayTanggal">Memuat...</span></p>
+            <p><strong>Jam:</strong> <span id="displayJam">Memuat...</span></p>
+        </div>
+        
         <div class="profile-card">
             <h3>Untuk Ciw:</h3>
             <p id="jawabanCiw">Memuat...</p>
@@ -20,7 +28,7 @@
             <h3>Untuk Kei:</h3>
             <p id="jawabanKei">Memuat...</p>
         </div>
-        <button onclick="resetJawaban()">Kosongkan Semua Jawaban</button>
+        <button onclick="resetJawaban()">Kosongkan Semua Data</button>
     </div>
     <script src="admin.js"></script>
 </body>
