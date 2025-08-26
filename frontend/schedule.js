@@ -20,7 +20,7 @@ async function kirimJadwal() {
         });
         
         // Jika berhasil terkirim, langsung pindah ke halaman pertanyaan
-        window.location.href = "ask.html";
+        window.location.href = "ask_cia.html";
 
     } catch (error) {
         console.error('Gagal mengirim jadwal:', error);

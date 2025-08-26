@@ -1,17 +1,25 @@
 const express = require('express');
+const { Pool } = require('pg'); // Menggunakan library 'pg'
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+// Ambil URL koneksi database dari environment variable
+const CONNECTION_STRING = process.env.DATABASE_URL;
 
-// Variabel untuk menyimpan jawaban di memori server
-let jawabanDisimpan = "Belum ada jawaban";
+// Buat koneksi ke database
+const pool = new Pool({
+    connectionString: CONNECTION_STRING,
+    ssl: {
+        rejectUnauthorized: false
+    }
+});
+
+const PORT = process.env.PORT || 3000;
 
 // === ROUTE LOGIN (TETAP SAMA) ===
 app.post('/api/login', (req, res) => {
     const { panggilan } = req.body;
     const sanitizedPanggilan = panggilan.toLowerCase();
-
     if (sanitizedPanggilan === 'ciamoroll' || sanitizedPanggilan === 'ciwkei') {
         res.status(200).json({ success: true, message: 'Login berhasil!' });
     } else {
@@ -19,38 +27,47 @@ app.post('/api/login', (req, res) => {
     }
 });
 
-// === ROUTE JADWAL (TETAP SAMA) ===
-app.post('/api/schedule', (req, res) => {
-    const { tanggal, jam } = req.body;
-    console.log(`Jadwal diterima: Tanggal ${tanggal}, Jam ${jam}`);
-    res.status(200).json({ message: 'Jadwal diterima' });
+// === ROUTE JAWABAN (DIMODIFIKASI UNTUK DATABASE) ===
+app.post('/api/jawaban', async (req, res) => {
+    const { person, answer } = req.body;
+
+    // Tentukan kolom mana yang akan di-update
+    const columnToUpdate = person === 'cia' ? 'jawaban_cia' : 'jawaban_kei';
+
+    try {
+        // Query untuk UPDATE data di database (hanya ada 1 baris, jadi id=1)
+        await pool.query(`UPDATE status SET ${columnToUpdate} = $1 WHERE id = 1`, [answer]);
+        console.log(`Jawaban untuk ${person} telah disimpan: ${answer}`);
+        res.status(200).json({ message: 'Jawaban berhasil disimpan!' });
+    } catch (error) {
+        console.error('Gagal update database:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-// === ROUTE JAWABAN (DIMODIFIKASI) ===
-// Sekarang menyimpan jawaban ke variabel
-app.post('/api/jawaban', (req, res) => {
-    const { jawaban } = req.body;
-    jawabanDisimpan = jawaban; // Simpan jawaban di sini
-    
-    console.log('===================================');
-    console.log('JAWABAN AKHIR TELAH DITERIMA!');
-    console.log(`Pilihan dia adalah: "${jawabanDisimpan}"`);
-    console.log('===================================');
-    
-    res.status(200).json({ message: 'Jawabanmu sudah kusimpan di hati <3' });
+// === ROUTE STATUS (DIMODIFIKASI UNTUK DATABASE) ===
+app.get('/api/status', async (req, res) => {
+    try {
+        // Query untuk SELECT data dari database
+        const result = await pool.query('SELECT jawaban_cia, jawaban_kei FROM status WHERE id = 1');
+        res.status(200).json(result.rows[0]); // Kirim baris pertama sebagai hasil
+    } catch (error) {
+        console.error('Gagal mengambil status dari DB:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
-// === ROUTE BARU UNTUK ADMIN: MENDAPATKAN STATUS ===
-app.get('/api/status', (req, res) => {
-    // Mengirimkan jawaban yang saat ini disimpan
-    res.status(200).json({ jawaban: jawabanDisimpan });
-});
-
-// === ROUTE BARU UNTUK ADMIN: MENGOSONGKAN JAWABAN ===
-app.post('/api/reset', (req, res) => {
-    jawabanDisimpan = "Belum ada jawaban"; // Reset jawaban
-    console.log('Jawaban telah direset oleh admin.');
-    res.status(200).json({ message: 'Jawaban berhasil dikosongkan.' });
+// === ROUTE RESET (DIMODIFIKASI UNTUK DATABASE) ===
+app.post('/api/reset', async (req, res) => {
+    try {
+        // Query untuk UPDATE dan reset kedua jawaban
+        await pool.query("UPDATE status SET jawaban_cia = 'Belum ada jawaban', jawaban_kei = 'Belum ada jawaban' WHERE id = 1");
+        console.log('Jawaban telah direset oleh admin.');
+        res.status(200).json({ message: 'Jawaban berhasil dikosongkan.' });
+    } catch (error) {
+        console.error('Gagal mereset DB:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
 });
 
 app.listen(PORT, () => {

@@ -1,37 +1,27 @@
-// Fungsi untuk mengambil status jawaban dari server
 async function getStatus() {
     try {
         const response = await fetch('/api/status');
         const data = await response.json();
         
-        // Tampilkan jawaban di halaman
-        document.getElementById('jawabanDisplay').textContent = data.jawaban;
+        document.getElementById('jawabanCiw').textContent = data.jawaban_cia;
+        document.getElementById('jawabanKei').textContent = data.jawaban_kei;
 
     } catch (error) {
-        console.error('Gagal mengambil status:', error);
-        document.getElementById('jawabanDisplay').textContent = "Gagal memuat status.";
+        document.getElementById('jawabanCiw').textContent = "Gagal memuat.";
+        document.getElementById('jawabanKei').textContent = "Gagal memuat.";
     }
 }
 
-// Fungsi untuk mereset jawaban
 async function resetJawaban() {
-    // Tampilkan konfirmasi
-    if (!confirm('Yakin mau mengosongkan jawaban? Ini untuk keperluan testing.')) {
-        return;
-    }
-
+    if (!confirm('Yakin mau mengosongkan semua jawaban?')) return;
     try {
         const response = await fetch('/api/reset', { method: 'POST' });
         const data = await response.json();
-
-        alert(data.message); // Tampilkan pesan sukses dari server
-        getStatus(); // Muat ulang status untuk melihat perubahannya
-
+        alert(data.message);
+        getStatus();
     } catch (error) {
-        console.error('Gagal mereset jawaban:', error);
         alert('Oops, gagal mereset jawaban.');
     }
 }
 
-// Panggil fungsi getStatus() saat halaman pertama kali dimuat
 document.addEventListener('DOMContentLoaded', getStatus);
