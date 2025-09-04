@@ -117,3 +117,82 @@
             window.location.href = 'ask_cia.html';
         };
     }
+
+    function drawSnakePart(snakePart, isHead = false) {
+        if (isHead) {
+            ctx.fillStyle = '#ff69b4'; // Warna kepala pink
+            ctx.strokeStyle = '#fff'; // Border putih
+        } else {
+            ctx.fillStyle = '#66ff66'; // Warna badan hijau terang
+            ctx.strokeStyle = '#fff'; // Border putih
+        }
+        ctx.fillRect(snakePart.x, snakePart.y, tileSize, tileSize);
+        ctx.strokeRect(snakePart.x, snakePart.y, tileSize, tileSize);
+    }
+
+    function drawFood() {
+        ctx.fillStyle = '#ff0000'; // Makanan warna merah
+        ctx.strokeStyle = '#fff';
+        ctx.fillRect(food.x, food.y, tileSize, tileSize);
+        ctx.strokeRect(food.x, food.y, tileSize, tileSize);
+    }
+
+    function checkCollision() {
+        // Tabrak diri sendiri
+        for (let i = 4; i < snake.length; i++) {
+            if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
+        }
+        // Tabrak dinding
+        const hitLeftWall = snake[0].x < 0;
+        const hitRightWall = snake[0].x >= canvas.width;
+        const hitTopWall = snake[0].y < 0;
+        const hitBottomWall = snake[0].y >= canvas.height;
+        
+        return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall;
+    }
+
+    function gameLoop() {
+        if (gameOver) {
+            showResultSnake();
+            return;
+        }
+
+        changingDirection = false; // Reset status belok
+
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
+
+            drawFood(); // Gambar makanan
+
+            // Pindahkan ular
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            snake.unshift(head); // Tambahkan kepala baru
+
+            const didEatFood = head.x === food.x && head.y === food.y;
+            if (didEatFood) {
+                score++;
+                generateFood(); // Buat makanan baru
+            } else {
+                snake.pop(); // Hapus bagian ekor jika tidak makan
+            }
+
+            if (checkCollision()) {
+                gameOver = true;
+                return;
+            }
+            
+            // Gambar semua bagian ular
+            snake.forEach((segment, index) => {
+                drawSnakePart(segment, index === 0); // Bagian pertama adalah kepala
+            });
+
+            gameLoop(); // Panggil loop selanjutnya
+        }, gameSpeed);
+    }
+
+    // --- MULAI GAME ---
+    generateFood(); // Buat makanan pertama
+    gameLoop(); // Mulai game loop
+</script>
+</body>
+</html>
