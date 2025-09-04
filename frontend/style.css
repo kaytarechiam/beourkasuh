@@ -31,14 +31,14 @@ body {
 }
 
 .container {
-    background-color: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     text-align: center;
-    max-width: 500px;
-    margin: 20px; /* Tambahkan margin agar tidak terlalu mepet */
-    border: 3px solid #b0e0e6; /* Border biru pastel */
+    max-width: 90%;
+    width: 500px;
+    color: #333; /* <- UBAH BARIS INI */
 }
 
 h1, h2 {

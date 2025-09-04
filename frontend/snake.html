@@ -3,196 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Game Ular Klasik</title>
+    <title>Cinnamoroll Snake</title>
     <link rel="stylesheet" href="style.css">
     <style>
         #gameContainerSnake {
-            background-color: #333; /* Warna latar belakang gelap untuk kesan klasik */
+            background-color: #f0f8ff; /* Alice Blue - Latar belakang Cinnamoroll */
             border-radius: 15px;
             padding: 10px;
-            user-select: none; 
+            user-select: none;
             -webkit-user-select: none;
-        }
-        #snakeInstructions {
-            color: #eee; /* Warna teks lebih terang */
-            font-size: 1.1em;
-            margin-bottom: 15px;
+            display: inline-block;
         }
         #snakeResult {
-            display: none; 
+            display: none;
             margin-top: 20px;
-        }
-        #snakeCanvas {
-            border: 2px solid #fff; /* Tambahkan border putih untuk kanvas */
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 style="color: #66ff66;">Game Terakhir: Ular Klasik!</h1>
-    <p style="color: #eee;">Gunakan tombol panah atau W/A/S/D untuk bergerak.</p>
-    <p id="snakeInstructions">Ayo kumpulkan semua hadiahnya!</p>
+    <h1>Game Ketiga: Cinnamoroll-Snake!</h1>
+    <p>Gunakan tombol panah atau W/A/S/D untuk bergerak.</p>
+    <p>Capai skor 15 untuk menang!</p>
     <div id="gameContainerSnake">
         <canvas id="snakeCanvas"></canvas>
     </div>
     <div id="snakeResult">
         <h2 id="resultTitleSnake"></h2>
-        <p>Skor Akhir: <span id="finalScoreSnake"></span></p>
-        <button id="nextButtonSnake">Lihat Hasil Akhir!</button>
+        <p id="resultMessageSnake"></p>
+        <button id="actionButtonSnake">Lanjut</button>
     </div>
 </div>
-
 
 <script>
     const canvas = document.getElementById('snakeCanvas');
     const ctx = canvas.getContext('2d');
 
-    const tileSize = 20; // Ukuran setiap kotak ular
-    canvas.width = 25 * tileSize; // Lebar canvas (500px)
-    canvas.height = 25 * tileSize; // Tinggi canvas (500px)
+    const tileSize = 20;
+    const canvasSize = 20; // 20 tiles x 20 tiles
+    canvas.width = canvas.height = canvasSize * tileSize;
 
-    // --- PENGATURAN GAME ---
-    let snake = [ 
-        { x: 12 * tileSize, y: 12 * tileSize }, // Posisi awal ular
-        { x: 11 * tileSize, y: 12 * tileSize },
-        { x: 10 * tileSize, y: 12 * tileSize }
-    ];
-    let food = { x: 0, y: 0 };
-    let dx = tileSize; // Arah awal ke kanan
-    let dy = 0;
-    let score = 0;
-    let gameOver = false;
-    let changingDirection = false; // Untuk mencegah belok cepat ganda
-    const gameSpeed = 150; // milliseconds, makin kecil makin cepat
+    let snake, food, direction, score, gameOver;
+    const MINIMUM_SCORE_TO_WIN = 15;
 
-    // --- FUNGSI UTAMA GAME ---
+    function initializeGame() {
+        snake = [{ x: 10, y: 10 }];
+        food = getRandomFoodPosition();
+        direction = { x: 0, y: 0 };
+        score = 0;
+        gameOver = false;
+        
+        document.getElementById('gameContainerSnake').style.display = 'block';
+        document.getElementById('snakeResult').style.display = 'none';
 
-    function generateFood() {
-        food.x = Math.floor(Math.random() * (canvas.width / tileSize)) * tileSize;
-        food.y = Math.floor(Math.random() * (canvas.height / tileSize)) * tileSize;
-
-        // Pastikan makanan tidak muncul di atas ular
-        for (let i = 0; i < snake.length; i++) {
-            if (food.x === snake[i].x && food.y === snake[i].y) {
-                generateFood(); // Ulangi jika tumpang tindih
-            }
-        }
+        gameLoop();
     }
 
-    // --- KONTROL PEMAIN ---
-    window.addEventListener('keydown', (e) => {
-        if (changingDirection) return;
-        changingDirection = true;
+    function getRandomFoodPosition() {
+        let newFood;
+        do {
+            newFood = {
+                x: Math.floor(Math.random() * canvasSize),
+                y: Math.floor(Math.random() * canvasSize)
+            };
+        } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y));
+        return newFood;
+    }
 
-        e.preventDefault(); // Mencegah scroll halaman
-        const keyPressed = e.key;
-        
-        const goingUp = dy === -tileSize;
-        const goingDown = dy === tileSize;
-        const goingLeft = dx === -tileSize;
-        const goingRight = dx === tileSize;
-
-        if ((keyPressed === 'ArrowLeft' || keyPressed === 'a') && !goingRight) {
-            dx = -tileSize; dy = 0;
-        }
-        if ((keyPressed === 'ArrowUp' || keyPressed === 'w') && !goingDown) {
-            dx = 0; dy = -tileSize;
-        }
-        if ((keyPressed === 'ArrowRight' || keyPressed === 'd') && !goingLeft) {
-            dx = tileSize; dy = 0;
-        }
-        if ((keyPressed === 'ArrowDown' || keyPressed === 's') && !goingUp) {
-            dx = 0; dy = tileSize;
+    window.addEventListener('keydown', e => {
+        e.preventDefault();
+        switch(e.key) {
+            case 'ArrowUp': case 'w':
+                if (direction.y === 0) direction = { x: 0, y: -1 };
+                break;
+            case 'ArrowDown': case 's':
+                if (direction.y === 0) direction = { x: 0, y: 1 };
+                break;
+            case 'ArrowLeft': case 'a':
+                if (direction.x === 0) direction = { x: -1, y: 0 };
+                break;
+            case 'ArrowRight': case 'd':
+                if (direction.x === 0) direction = { x: 1, y: 0 };
+                break;
         }
     });
-    
-    function showResultSnake() {
+
+    function showResult(isWin) {
+        gameOver = true;
         document.getElementById('gameContainerSnake').style.display = 'none';
         document.getElementById('snakeResult').style.display = 'block';
-        document.getElementById('resultTitleSnake').textContent = "Game Selesai!";
-        document.getElementById('finalScoreSnake').textContent = score;
-        document.getElementById('nextButtonSnake').onclick = () => {
-            // Arahkan ke halaman pertanyaan pertama
-            window.location.href = 'ask_cia.html';
-        };
-    }
+        const title = document.getElementById('resultTitleSnake');
+        const message = document.getElementById('resultMessageSnake');
+        const button = document.getElementById('actionButtonSnake');
 
-    function drawSnakePart(snakePart, isHead = false) {
-        if (isHead) {
-            ctx.fillStyle = '#ff69b4'; // Warna kepala pink
-            ctx.strokeStyle = '#fff'; // Border putih
+        if (isWin) {
+            title.textContent = "Kamu Menang!";
+            message.textContent = `Hebat, kamu berhasil menyelesaikan semua game! Skor akhir: ${score}`;
+            button.textContent = "Lihat Pesan Terakhir";
+            button.onclick = () => { window.location.href = 'thankyou.html'; };
         } else {
-            ctx.fillStyle = '#66ff66'; // Warna badan hijau terang
-            ctx.strokeStyle = '#fff'; // Border putih
+            title.textContent = "Game Over!";
+            message.textContent = `Kamu menabrak dirimu sendiri. Skor: ${score}`;
+            button.textContent = "Main Lagi";
+            button.onclick = () => window.location.reload();
         }
-        ctx.fillRect(snakePart.x, snakePart.y, tileSize, tileSize);
-        ctx.strokeRect(snakePart.x, snakePart.y, tileSize, tileSize);
-    }
-
-    function drawFood() {
-        ctx.fillStyle = '#ff0000'; // Makanan warna merah
-        ctx.strokeStyle = '#fff';
-        ctx.fillRect(food.x, food.y, tileSize, tileSize);
-        ctx.strokeRect(food.x, food.y, tileSize, tileSize);
-    }
-
-    function checkCollision() {
-        // Tabrak diri sendiri
-        for (let i = 4; i < snake.length; i++) {
-            if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
-        }
-        // Tabrak dinding
-        const hitLeftWall = snake[0].x < 0;
-        const hitRightWall = snake[0].x >= canvas.width;
-        const hitTopWall = snake[0].y < 0;
-        const hitBottomWall = snake[0].y >= canvas.height;
-        
-        return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall;
     }
 
     function gameLoop() {
-        if (gameOver) {
-            showResultSnake();
-            return;
-        }
+        if (gameOver) return;
 
-        changingDirection = false; // Reset status belok
+        // --- Logika Utama Game ---
+        const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-        setTimeout(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
+        // --- Logika Tembok Tembus (Nokia Style) ---
+        if (head.x < 0) head.x = canvasSize - 1;
+        if (head.x >= canvasSize) head.x = 0;
+        if (head.y < 0) head.y = canvasSize - 1;
+        if (head.y >= canvasSize) head.y = 0;
 
-            drawFood(); // Gambar makanan
-
-            // Pindahkan ular
-            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
-            snake.unshift(head); // Tambahkan kepala baru
-
-            const didEatFood = head.x === food.x && head.y === food.y;
-            if (didEatFood) {
-                score++;
-                generateFood(); // Buat makanan baru
-            } else {
-                snake.pop(); // Hapus bagian ekor jika tidak makan
-            }
-
-            if (checkCollision()) {
-                gameOver = true;
+        // Cek tabrakan dengan diri sendiri
+        // Mulai dari 1 untuk mengabaikan kepala
+        for (let i = 1; i < snake.length; i++) {
+            if (head.x === snake[i].x && head.y === snake[i].y) {
+                showResult(false);
                 return;
             }
-            
-            // Gambar semua bagian ular
-            snake.forEach((segment, index) => {
-                drawSnakePart(segment, index === 0); // Bagian pertama adalah kepala
-            });
+        }
 
-            gameLoop(); // Panggil loop selanjutnya
-        }, gameSpeed);
+        snake.unshift(head);
+
+        // Cek makan makanan
+        if (head.x === food.x && head.y === food.y) {
+            score++;
+            food = getRandomFoodPosition();
+            // Cek kemenangan
+            if (score >= MINIMUM_SCORE_TO_WIN) {
+                showResult(true);
+                return;
+            }
+        } else {
+            snake.pop();
+        }
+
+        // --- Gambar Ulang Semua ---
+        // Latar belakang
+        ctx.fillStyle = '#f0f8ff'; // Alice Blue
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Gambar grid
+        for (let i = 0; i < canvasSize; i++) {
+            for (let j = 0; j < canvasSize; j++) {
+                ctx.strokeStyle = '#e0e8f0'; // Warna grid lebih lembut
+                ctx.strokeRect(i * tileSize, j * tileSize, tileSize, tileSize);
+            }
+        }
+
+        // Gambar ular
+        snake.forEach(segment => {
+            ctx.fillStyle = '#87ceeb'; // Sky Blue (Cinnamoroll Blue)
+            ctx.fillRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+            ctx.strokeStyle = '#f0f8ff'; // Alice Blue (outline)
+            ctx.strokeRect(segment.x * tileSize, segment.y * tileSize, tileSize, tileSize);
+        });
+
+        // Gambar makanan
+        ctx.fillStyle = '#ffb6c1'; // Light Pink (Cinnamoroll's cheek color)
+        ctx.fillRect(food.x * tileSize, food.y * tileSize, tileSize, tileSize);
+        
+        setTimeout(gameLoop, 150 - score * 5); // Kecepatan bertambah seiring skor
     }
 
-    // --- MULAI GAME ---
-    generateFood(); // Buat makanan pertama
-    gameLoop(); // Mulai game loop
+    initializeGame();
+
 </script>
+
 </body>
 </html>
