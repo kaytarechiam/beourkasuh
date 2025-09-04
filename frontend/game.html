@@ -2,16 +2,19 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Flappy Cinnamoroll</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
-<div id="gameContainer" class="container"> <canvas id="gameCanvas" width="400" height="600"></canvas>
-    <div id="gameOverScreen">
+<div id="gameContainer" class="container">
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="gameOverScreen" class="container">
         <h2>Game Over!</h2>
         <p>Skor kamu: <span id="finalScore">0</span></p>
-        <p id="gameMessage"></p> <button id="lanjutButton" onclick="lanjutKePertanyaan()">Lanjut</button>
+        <p id="gameMessage"></p>
+        <button id="lanjutButton" onclick="lanjutKePertanyaan()" style="display: none;">Lanjut</button>
     </div>
 </div>
 
@@ -19,193 +22,146 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // --- PENGATURAN & KUSTOMISASI GAME ---
-
-    // 1. Muat gambar Cinnamoroll di sini
+    // --- ASET & PENGATURAN ---
     const cinnamorollImg = new Image();
-    cinnamorollImg.src = 'cinnamoroll_player.png'; // <--- PASTIKAN NAMA FILE DAN LOKASI BENAR
+    cinnamorollImg.src = 'cinnamoroll_player.png'; // Pastikan nama file ini benar
 
-    // Pengaturan Pemain (Cinnamoroll)
     let player = {
-        x: 50,
-        y: 150,
-        width: 60, // Sesuaikan dengan lebar gambar Cinnamoroll
-        height: 50, // Sesuaikan dengan tinggi gambar Cinnamoroll
-        velocityY: 0,
-        gravity: 0.4,
-        lift: -8
+        x: 70, y: 250, width: 60, height: 50,
+        velocityY: 0, gravity: 0.4, lift: -8
     };
 
-    // Pengaturan Game
     const pipes = [];
-    const pipeWidth = 60;
-    const pipeGap = 180;
-    let frameCount = 0;
     let score = 0;
+    const requiredScore = 5;
+    let frameCount = 0;
+    
+    // --- STATUS GAME ---
+    let gameStarted = false;
     let gameOver = false;
-    const requiredScore = 5; // <--- SKOR MINIMUM UNTUK BISA LANJUT
-    let gameWon = false; // Status apakah game selesai dengan skor cukup
+    let gameWon = false;
 
-    // Warna Pipa & Teks Skor (dari style.css atau bisa override di sini)
-    const pipeColor = '#87ceeb';
-    const scoreColor = '#ff69b4';
-
-    // Durasi game "normal" : Sekitar 1 menit untuk skor 5-10
-    // frameCount % 100 -> pipa baru setiap 100 frame
-    // p.x -= 3 -> kecepatan pipa
-
+    // --- FUNGSI KONTROL ---
     function jump() {
+        // Jika game belum mulai, kita mulai game-nya
+        if (!gameStarted) {
+            gameStarted = true;
+        }
+        // Jika game sudah berjalan, buat Cinnamoroll melompat
         if (!gameOver) {
             player.velocityY = player.lift;
         }
     }
 
-    // Event listener untuk melompat (klik atau sentuh)
-    canvas.addEventListener('mousedown', jump);
-    canvas.addEventListener('touchstart', jump);
+    // --- EVENT LISTENER (CARA MAIN) ---
+    // Sekarang bisa pakai klik, sentuh, atau spasi
+    window.addEventListener('mousedown', jump);
+    window.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Mencegah zoom/scroll di mobile
+        jump();
+    });
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            jump();
+        }
+    });
 
+    // --- FUNGSI TAMPILAN GAME OVER & LANJUT ---
     function showGameOver() {
         gameOver = true;
+        const gameOverScreen = document.getElementById('gameOverScreen');
         document.getElementById('finalScore').textContent = score;
         const gameMessage = document.getElementById('gameMessage');
         const lanjutButton = document.getElementById('lanjutButton');
 
         if (score >= requiredScore) {
             gameWon = true;
-            gameMessage.innerHTML = `Selamat, kamu mencapai skor ${score}! <br> Lanjut ke pertanyaan...`;
-            lanjutButton.style.display = 'block'; // Tampilkan tombol lanjut
+            gameMessage.innerHTML = `Hore! Kamu berhasil dapat skor ${score}! <br> Yuk lanjut...`;
+            lanjutButton.style.display = 'block';
         } else {
-            gameMessage.innerHTML = `Skor kamu ${score}. Kamu perlu skor ${requiredScore} untuk lanjut. <br> Coba lagi!`;
-            lanjutButton.style.display = 'none'; // Sembunyikan tombol lanjut
-            // Tambahkan tombol restart jika perlu
-            const restartButton = document.createElement('button');
-            restartButton.textContent = 'Main Lagi';
-            restartButton.id = 'restartButton';
-            restartButton.style.marginTop = '10px';
-            restartButton.style.backgroundColor = '#4CAF50';
-            restartButton.onclick = () => window.location.reload(); // Refresh halaman untuk main lagi
-            if (!document.getElementById('restartButton')) { // Pastikan tidak membuat tombol duplikat
-                document.getElementById('gameOverScreen').appendChild(restartButton);
+            gameMessage.innerHTML = `Skor kamu baru ${score}. Coba lagi ya, kamu perlu skor ${requiredScore} untuk lanjut!`;
+            lanjutButton.style.display = 'none';
+            if (!document.getElementById('restartButton')) {
+                const restartButton = document.createElement('button');
+                restartButton.textContent = 'Main Lagi';
+                restartButton.id = 'restartButton';
+                restartButton.onclick = () => window.location.reload();
+                gameOverScreen.appendChild(restartButton);
             }
         }
-        document.getElementById('gameOverScreen').style.display = 'block';
+        gameOverScreen.style.display = 'block';
     }
 
     function lanjutKePertanyaan() {
-        // Hanya jika game dimenangkan
         if (gameWon) {
             window.location.href = 'ask_cia.html';
         }
     }
 
+    // --- LOOP UTAMA GAME ---
     function draw() {
-        if (gameOver) return;
-
-        // Gambar latar belakang (bisa juga gambar awan/langit Cinnamoroll)
-        ctx.fillStyle = '#f0f8ff'; // AliceBlue
+        // Gambar latar belakang
+        ctx.fillStyle = '#f0f8ff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Gambar & perbarui pipa
-        if (frameCount % 100 === 0) {
-            const topPipeHeight = Math.random() * (canvas.height - pipeGap - 100) + 50;
-            pipes.push({
-                x: canvas.width,
-                topHeight: topPipeHeight,
-                bottomY: topPipeHeight + pipeGap,
-                passed: false
-            });
-        }
+        // Jika game belum dimulai, tampilkan instruksi
+        if (!gameStarted) {
+            ctx.fillStyle = '#ff69b4';
+            ctx.font = 'bold 28px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('Flappy Cinnamoroll', canvas.width / 2, canvas.height / 2 - 60);
+            ctx.font = '20px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#555';
+            ctx.fillText('Klik/Sentuh Layar atau Tekan Spasi', canvas.width / 2, canvas.height / 2);
+            ctx.fillText('untuk Mulai Terbang!', canvas.width / 2, canvas.height / 2 + 30);
+            ctx.textAlign = 'start';
+        } else {
+            // --- Logika Game Berjalan ---
 
-        for (let i = pipes.length - 1; i >= 0; i--) {
-            const p = pipes[i];
-            p.x -= 3; // Kecepatan pipa
-
-            ctx.fillStyle = pipeColor;
-            ctx.fillRect(p.x, 0, pipeWidth, p.topHeight);
-            ctx.fillRect(p.x, p.bottomY, pipeWidth, canvas.height - p.bottomY);
-
-            if (p.x + pipeWidth < 0) {
-                pipes.splice(i, 1);
+            // Perbarui & gambar pipa
+            if (frameCount % 100 === 0) {
+                const topPipeHeight = Math.random() * (canvas.height - 200 - 150) + 75;
+                pipes.push({ x: canvas.width, topHeight: topPipeHeight, bottomY: topPipeHeight + 200, passed: false });
+            }
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                const p = pipes[i];
+                p.x -= 3;
+                ctx.fillStyle = '#87ceeb';
+                ctx.fillRect(p.x, 0, 60, p.topHeight);
+                ctx.fillRect(p.x, p.bottomY, 60, canvas.height - p.bottomY);
+                if (p.x + 60 < 0) pipes.splice(i, 1);
+                if (p.x + 60 < player.x && !p.passed) { p.passed = true; score++; }
+                if (player.x < p.x + 60 && player.x + player.width > p.x && (player.y < p.topHeight || player.y + player.height > p.bottomY)) { showGameOver(); return; }
             }
 
-            if (p.x + pipeWidth < player.x && !p.passed) {
-                p.passed = true;
-                score++;
-            }
-
-            // Cek tabrakan
-            if (
-                player.x < p.x + pipeWidth &&
-                player.x + player.width > p.x &&
-                (player.y < p.topHeight || player.y + player.height > p.bottomY)
-            ) {
-                showGameOver();
-                return; // Hentikan game
-            }
-        }
-
-        // Gambar & perbarui pemain (Cinnamoroll)
-        player.velocityY += player.gravity;
-        player.y += player.velocityY;
-
-        if (player.y + player.height > canvas.height || player.y < 0) {
-            showGameOver();
-            return; // Hentikan game
-        }
-        
-        ctx.drawImage(cinnamorollImg, player.x, player.y, player.width, player.height);
-
-        // Tampilkan skor
-        ctx.fillStyle = scoreColor;
-        ctx.font = '30px "Plus Jakarta Sans"';
-        ctx.fillText('Skor: ' + score, 10, 40);
-        ctx.fillText('Target: ' + requiredScore, 10, 75); // Tampilkan target skor
-
-        frameCount++;
-        requestAnimationFrame(draw);
-    }
-    
-    // Tunggu gambar Cinnamoroll selesai dimuat sebelum memulai game
-    cinnamorollImg.onload = () => {
-        draw();
-    };
-
-    // Jika gambar gagal dimuat, tetap mulai game dengan kotak sebagai pengganti
-    cinnamorollImg.onerror = () => {
-        console.error("Gambar Cinnamoroll gagal dimuat, menggunakan kotak biru sebagai pengganti.");
-        // Fallback drawing function if image fails to load
-        function drawFallback() {
-            if (gameOver) return;
-
-            // Gambar latar belakang
-            ctx.fillStyle = '#f0f8ff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Pipa logic
-            if (frameCount % 100 === 0) { /* ... */ }
-            for (let i = pipes.length - 1; i >= 0; i--) { /* ... */ }
-
-            // Pemain (kotak biru)
+            // Perbarui & gambar pemain
             player.velocityY += player.gravity;
             player.y += player.velocityY;
-
-            if (player.y + player.height > canvas.height || player.y < 0) {
-                showGameOver();
-                return;
-            }
-            ctx.fillStyle = '#87ceeb'; // Warna kotak pengganti
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-
+            if (player.y + player.height > canvas.height || player.y < 0) { showGameOver(); return; }
+            
             // Tampilkan skor
-            ctx.fillStyle = scoreColor;
-            ctx.font = '30px "Plus Jakarta Sans"';
-            ctx.fillText('Skor: ' + score, 10, 40);
-            ctx.fillText('Target: ' + requiredScore, 10, 75);
-
-            frameCount++;
-            requestAnimationFrame(drawFallback);
+            ctx.fillStyle = '#ff69b4';
+            ctx.font = 'bold 30px "Plus Jakarta Sans"';
+            ctx.fillText('Skor: ' + score, 15, 40);
+            ctx.font = 'bold 20px "Plus Jakarta Sans"';
+            ctx.fillText('Target: ' + requiredScore, 15, 70);
         }
-        drawFallback();
+        
+        // Selalu gambar Cinnamoroll
+        ctx.drawImage(cinnamorollImg, player.x, player.y, player.width, player.height);
+
+        // Lanjutkan ke frame berikutnya
+        if (!gameOver) {
+            frameCount++;
+            requestAnimationFrame(draw);
+        }
+    }
+    
+    // Mulai loop gambar saat gambar selesai dimuat
+    cinnamorollImg.onload = draw;
+    cinnamorollImg.onerror = () => {
+        alert("Gagal memuat gambar cinnamoroll_player.png. Pastikan filenya ada di folder frontend ya!");
+        draw(); // Tetap jalankan game walau tanpa gambar
     }
 </script>
 
