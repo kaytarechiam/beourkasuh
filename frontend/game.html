@@ -76,10 +76,10 @@
 
         if (score >= requiredScore) {
             gameWon = true;
-            gameMessage.innerHTML = `Hore! Kamu berhasil dapat skor ${score}! <br> Yuk lanjut...`;
+            gameMessage.innerHTML = `Yayy! Congratss kak dapet skor ${score}! <br> yuk next...`;
             lanjutButton.style.display = 'block';
         } else {
-            gameMessage.innerHTML = `Skor kamu baru ${score}. Coba lagi ya, kamu perlu skor ${requiredScore} untuk lanjut!`;
+            gameMessage.innerHTML = `Skor kak cia baru ${score}. Coba lagi ya kak, need skor ${requiredScore} untuk next hehe!`;
             lanjutButton.style.display = 'none';
             if (!document.getElementById('restartButton')) {
                 const restartButton = document.createElement('button');
