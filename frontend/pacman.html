@@ -10,7 +10,7 @@
             background-color: #000;
             border-radius: 15px;
             padding: 10px;
-            user-select: none;
+            user-select: none; 
             -webkit-user-select: none;
         }
         #pacmanInstructions {
@@ -48,7 +48,7 @@
     canvas.width = 15 * tileSize;
     canvas.height = 16 * tileSize;
 
-    // Aset Gambar
+    // --- ASET GAMBAR ---
     const playerImg = new Image();
     playerImg.src = 'cinnamoroll_player.png'; 
 
@@ -58,7 +58,7 @@
     const ghost2Img = new Image();
     ghost2Img.src = 'kei_ghost.png';
 
-    // Peta Game (0=kosong, 1=dinding, 2=koin)
+    // --- PETA GAME ---
     const map = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
@@ -68,7 +68,7 @@
         [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
         [1,1,1,2,1,1,0,0,0,1,1,2,1,1,1],
         [0,0,1,2,1,0,0,0,0,0,1,2,1,0,0],
-        [1,1,1,2,1,1,1,1,1,1,1,2,1,1,1],
+        [1,1,1,2,1,0,0,0,0,0,1,2,1,1,1],
         [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
         [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
         [1,2,2,2,1,1,2,2,2,1,1,2,2,2,1],
@@ -78,25 +78,27 @@
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ];
 
-    let player = {};
-    let ghosts = [];
-    let score = 0;
-    let totalCoins = map.reduce((sum, row) => sum + row.filter(tile => tile === 2).length, 0);
-    let gameOver = false;
+    // --- Variabel Game ---
+    let player, ghosts, score, totalCoins, gameOver;
 
-    function resetPositions() {
-        // PERBAIKAN: Posisi awal pemain di area yang aman (kosong)
+    function initializeGame() {
         player = { x: 7 * tileSize, y: 8 * tileSize, dx: 0, dy: 0, speed: 2, nextDx: 0, nextDy: 0 };
         ghosts = [
             { x: 6 * tileSize, y: 7 * tileSize, dx: 0, dy: 2, speed: 1.5, img: ghost1Img },
             { x: 8 * tileSize, y: 7 * tileSize, dx: 0, dy: -2, speed: 1.5, img: ghost2Img }
         ];
+        score = 0;
+        totalCoins = map.reduce((sum, row) => sum + row.filter(tile => tile === 2).length, 0);
+        gameOver = false;
+
+        // Reset tampilan
+        document.getElementById('gameContainerPacman').style.display = 'block';
+        document.getElementById('pacmanResult').style.display = 'none';
     }
     
     // --- KONTROL PEMAIN ---
     window.addEventListener('keydown', (e) => {
         e.preventDefault();
-        // Simpan input arah berikutnya
         switch(e.key) {
             case 'ArrowUp': case 'w': player.nextDx = 0; player.nextDy = -player.speed; break;
             case 'ArrowDown': case 's': player.nextDx = 0; player.nextDy = player.speed; break;
@@ -106,19 +108,12 @@
     });
 
     function isWall(x, y) {
-        // Fungsi untuk mengecek tabrakan dengan dinding secara akurat
-        const onGrid = (n) => n % tileSize === 0;
-        if (!onGrid(x) && !onGrid(y)) return true;
-
         const col = Math.floor(x / tileSize);
         const row = Math.floor(y / tileSize);
-        if (map[row] && map[row][col] === 1) return true;
-        
-        const col2 = Math.floor((x + tileSize - 1) / tileSize);
-        const row2 = Math.floor((y + tileSize - 1) / tileSize);
-        if (map[row2] && map[row2][col2] === 1) return true;
-        
-        return false;
+        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
+            return true;
+        }
+        return map[row][col] === 1;
     }
     
     function showResult(isWin) {
@@ -146,18 +141,20 @@
     function gameLoop() {
         if (gameOver) return;
 
-        // --- Pergerakan Pemain yang Diperbaiki ---
-        // Cek apakah bisa berbelok
-        if (player.nextDy !== 0 || player.nextDx !== 0) {
-            if (!isWall(player.x + player.nextDx, player.y + player.nextDy)) {
-                player.dx = player.nextDx;
-                player.dy = player.nextDy;
-                player.nextDx = 0;
-                player.nextDy = 0;
+        // Logika Pergerakan Pemain
+        const onGrid = (n) => n % tileSize === 0;
+        if (onGrid(player.x) && onGrid(player.y)) {
+            if (player.nextDx !== 0 || player.nextDy !== 0) {
+                if (!isWall(player.x + player.nextDx, player.y + player.nextDy)) {
+                    player.dx = player.nextDx;
+                    player.dy = player.nextDy;
+                    player.nextDx = 0;
+                    player.nextDy = 0;
+                }
             }
         }
-        // Cek apakah akan menabrak dinding
-        if (isWall(player.x + player.dx, player.y + player.dy)) {
+
+        if (onGrid(player.x) && onGrid(player.y) && isWall(player.x + player.dx, player.y + player.dy)) {
             player.dx = 0;
             player.dy = 0;
         }
@@ -182,7 +179,14 @@
         
         // Gerakan & Cek Tabrakan Hantu
         ghosts.forEach(ghost => {
-            // ... (logika hantu tetap sama, bisa disesuaikan nanti)
+            ghost.x += ghost.dx;
+            ghost.y += ghost.dy;
+            if (isWall(ghost.x, ghost.y) || isWall(ghost.x + tileSize - 1, ghost.y + tileSize - 1) || Math.random() < 0.05) {
+                const directions = [{dx: ghost.speed, dy: 0}, {dx: -ghost.speed, dy: 0}, {dx: 0, dy: ghost.speed}, {dx: 0, dy: -ghost.speed}];
+                const newDir = directions[Math.floor(Math.random() * directions.length)];
+                ghost.dx = newDir.dx;
+                ghost.dy = newDir.dy;
+            }
             if (Math.hypot(player.x - ghost.x, player.y - ghost.y) < tileSize - 10) {
                 showResult(false);
             }
@@ -216,7 +220,7 @@
         img.onload = () => {
             imagesLoaded++;
             if (imagesLoaded === totalImages) {
-                resetPositions();
+                initializeGame();
                 gameLoop();
             }
         };
