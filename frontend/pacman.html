@@ -18,7 +18,7 @@
             margin-bottom: 15px;
         }
         #pacmanResult {
-            display: none; 
+            display: none;
             margin-top: 20px;
         }
     </style>
@@ -50,7 +50,7 @@
 
     // Aset Gambar
     const playerImg = new Image();
-    playerImg.src = 'cinnamoroll_player.png'; 
+    playerImg.src = 'cinnamoroll_player.png';
 
     const ghost1Img = new Image();
     ghost1Img.src = 'ciw_ghost.png';
@@ -92,7 +92,7 @@
         document.getElementById('gameContainerPacman').style.display = 'block';
         document.getElementById('pacmanResult').style.display = 'none';
     }
-    
+
     window.addEventListener('keydown', (e) => {
         e.preventDefault();
         switch(e.key) {
@@ -106,10 +106,26 @@
     function isWall(x, y) {
         const col = Math.floor(x / tileSize);
         const row = Math.floor(y / tileSize);
-        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
+        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
+            return true; // Anggap luar peta sebagai dinding
+        }
         return map[row][col] === 1;
     }
-    
+
+    // Fungsi baru untuk memeriksa tabrakan dengan lebih akurat
+    function canMove(x, y, dx, dy) {
+        const nextX = x + dx;
+        const nextY = y + dy;
+
+        // Periksa keempat sudut dari posisi pemain berikutnya untuk memastikan tidak ada bagian yang menabrak
+        if (isWall(nextX, nextY)) return false; // Kiri atas
+        if (isWall(nextX + tileSize - 1, nextY)) return false; // Kanan atas
+        if (isWall(nextX, nextY + tileSize - 1)) return false; // Kiri bawah
+        if (isWall(nextX + tileSize - 1, nextY + tileSize - 1)) return false; // Kanan bawah
+
+        return true;
+    }
+
     function showResult(isWin) {
         gameOver = true;
         document.getElementById('gameContainerPacman').style.display = 'none';
@@ -122,7 +138,7 @@
             title.textContent = "Kamu Menang!";
             message.textContent = `Hebat, semua koin terkumpul! Skor: ${score}`;
             nextButton.textContent = "Lanjut ke Game Ular";
-            nextButton.onclick = () => { window.location.href = 'snake.html'; }; 
+            nextButton.onclick = () => { window.location.href = 'snake.html'; };
         } else {
             title.textContent = "Kamu Tertangkap!";
             message.textContent = "Jangan menyerah, coba lagi ya!";
@@ -136,32 +152,31 @@
 
         // --- Logika Pergerakan Pemain yang Diperbaiki ---
         const onGrid = (n) => n % tileSize === 0;
-        
+
         // Cek jika bisa berbelok di persimpangan
         if (onGrid(player.x) && onGrid(player.y)) {
-            let nextTurnX = player.x + player.nextDx;
-            let nextTurnY = player.y + player.nextDy;
-            if (!isWall(nextTurnX, nextTurnY)) {
-                player.dx = player.nextDx;
-                player.dy = player.nextDy;
+            if (player.nextDx !== 0 || player.nextDy !== 0) { // Jika ada input arah baru
+                if (canMove(player.x, player.y, player.nextDx, player.nextDy)) {
+                    player.dx = player.nextDx;
+                    player.dy = player.nextDy;
+                }
             }
         }
 
         // Cek jika akan menabrak dinding di arah saat ini
-        let nextX = player.x + player.dx;
-        let nextY = player.y + player.dy;
-        if (onGrid(player.x) && onGrid(player.y) && isWall(nextX, nextY)) {
+        if (!canMove(player.x, player.y, player.dx, player.dy)) {
             player.dx = 0;
             player.dy = 0;
         }
-        
+
         player.x += player.dx;
         player.y += player.dy;
+
 
         // Terowongan
         if (player.x < -tileSize) player.x = canvas.width;
         if (player.x > canvas.width) player.x = -tileSize;
-        
+
         // Cek Koin
         const playerCol = Math.floor((player.x + tileSize/2) / tileSize);
         const playerRow = Math.floor((player.y + tileSize/2) / tileSize);
@@ -173,7 +188,7 @@
                 return;
             }
         }
-        
+
         // Gerakan & Cek Tabrakan Hantu
         ghosts.forEach(ghost => {
              // Gerakan hantu yang lebih simpel untuk mencegah bug
@@ -191,7 +206,7 @@
             }
             ghost.x += ghost.dx;
             ghost.y += ghost.dy;
-            
+
             if (Math.hypot(player.x - ghost.x, player.y - ghost.y) < tileSize - 10) {
                 showResult(false);
             }
@@ -217,7 +232,7 @@
 
         requestAnimationFrame(gameLoop);
     }
-    
+
     let imagesLoaded = 0;
     const totalImages = 3;
     [playerImg, ghost1Img, ghost2Img].forEach(img => {
