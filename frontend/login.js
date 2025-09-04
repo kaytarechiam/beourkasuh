@@ -24,7 +24,7 @@ async function checkLogin() {
         });
 
         if (response.ok) {
-            window.location.href = "opening.html";
+            window.location.href = "game.html";
         } else {
             const dataError = await response.json();
             alert(dataError.message);
