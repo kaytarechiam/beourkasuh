@@ -110,15 +110,15 @@
         const button = document.getElementById('actionButtonSnake');
 
         if (isWin) {
-            title.textContent = "Kamu Menang!";
-            message.textContent = `Hebat, kamu berhasil menyelesaikan semua game! Skor akhir: ${score}`;
-            button.textContent = "Lihat Pesan";
+            title.textContent = "Congratss!";
+            message.textContent = `skor akhir: ${score}`;
+            button.textContent = "See messages";
             // DIUBAH DI SINI: Arahkan ke halaman buku
             button.onclick = () => { window.location.href = 'message_book.html'; };
         } else {
-            title.textContent = "Game Over!";
-            message.textContent = `Kamu menabrak dirimu sendiri. Skor: ${score}`;
-            button.textContent = "Main Lagi";
+            title.textContent = "Game Over yahh!";
+            message.textContent = `Kak kok nabrak ekor sendiri sii. Skor: ${score}`;
+            button.textContent = "Try Again";
             button.onclick = () => window.location.reload();
         }
     }

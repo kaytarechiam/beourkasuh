@@ -28,14 +28,14 @@
 <div class="container">
     <h1>Cinnamoroll-Man!</h1>
     <p>hihihi pacman dupe</p>
-    <p id="pacmanInstructions">Hayoo dikejarr desuuuuh</p>
+    <p id="pacmanInstructions">hayoo dikejarr desuuuuh</p>
     <div id="gameContainerPacman">
         <canvas id="pacmanCanvas"></canvas>
     </div>
     <div id="pacmanResult">
         <h2 id="resultTitle"></h2>
         <p id="resultMessage"></p>
-        <button id="nextButton">Lanjut</button>
+        <button id="nextButton">next</button>
     </div>
 </div>
 
@@ -135,14 +135,14 @@
         const nextButton = document.getElementById('nextButton');
 
         if (isWin) {
-            title.textContent = "Kamu Menang!";
-            message.textContent = `Hebat, semua koin terkumpul! Skor: ${score}`;
-            nextButton.textContent = "Lanjut ke Game Ular";
+            title.textContent = "Kak Cia win yayy!";
+            message.textContent = `Skor: ${score}`;
+            nextButton.textContent = "next";
             nextButton.onclick = () => { window.location.href = 'snake.html'; };
         } else {
-            title.textContent = "Kamu Tertangkap!";
-            message.textContent = "Jangan menyerah, coba lagi ya!";
-            nextButton.textContent = "Main Lagi";
+            title.textContent = "OH naurr ketangkep!";
+            message.textContent = "yuk kak coba lagi!";
+            nextButton.textContent = "Try Again";
             nextButton.onclick = () => window.location.reload();
         }
     }
