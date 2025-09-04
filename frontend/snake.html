@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Game Ular Cinnamoroll</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #gameContainerSnake {
+            background-color: #90EE90; /* LightGreen */
+            border-radius: 15px;
+            padding: 10px;
+        }
+        #snakeInstructions {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Game Terakhir: Ular-ularan!</h1>
+    <p id="snakeInstructions">Ayo kumpulkan semua hadiahnya!</p>
+    <div id="gameContainerSnake">
+        <canvas id="snakeCanvas"></canvas>
+    </div>
+    <div id="snakeResult" style="display: none; margin-top: 20px;">
+        <h2 id="resultTitleSnake"></h2>
+        <p>Skor Akhir: <span id="finalScoreSnake"></span></p>
+        <button id="nextButtonSnake">Lihat Hasil Akhir!</button>
+    </div>
+</div>
+
+
+<script>
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const tileSize = 25;
+    canvas.width = 20 * tileSize; // 500px
+    canvas.height = 20 * tileSize; // 500px
+
+    // --- ASET GAMBAR ---
+    const headImg = new Image();
+    headImg.src = 'cinnamoroll_player.png'; // Ganti dengan gambar kepala Cinnamoroll
+
+    const foodImg = new Image();
+    foodImg.src = 'food.png'; // Ganti dengan gambar makanan (misal: permen, kue)
+
+    // --- PENGATURAN GAME ---
+    let snake = [ { x: 10 * tileSize, y: 10 * tileSize } ];
+    let food = { x: 0, y: 0 };
+    let dx = 0;
+    let dy = 0;
+    let score = 0;
+    let gameOver = false;
+    const gameSpeed = 120; // milliseconds, makin kecil makin cepat
+
+    function generateFood() {
+        food.x = Math.floor(Math.random() * (canvas.width / tileSize)) * tileSize;
+        food.y = Math.floor(Math.random() * (canvas.height / tileSize)) * tileSize;
+    }
+
+    // --- KONTROL PEMAIN ---
+    window.addEventListener('keydown', (e) => {
+        e.preventDefault();
+        switch(e.key) {
+            case 'ArrowUp': case 'w':
+                if (dy === 0) { dx = 0; dy = -tileSize; }
+                break;
+            case 'ArrowDown': case 's':
+                if (dy === 0) { dx = 0; dy = tileSize; }
+                break;
+            case 'ArrowLeft': case 'a':
+                if (dx === 0) { dx = -tileSize; dy = 0; }
+                break;
+            case 'ArrowRight': case 'd':
+                if (dx === 0) { dx = tileSize; dy = 0; }
+                break;
+        }
+    });
+    
+    function showResultSnake() {
+        document.getElementById('gameContainerSnake').style.display = 'none';
+        document.getElementById('snakeResult').style.display = 'block';
+        document.getElementById('resultTitleSnake').textContent = "Game Selesai!";
+        document.getElementById('finalScoreSnake').textContent = score;
+        document.getElementById('nextButtonSnake').onclick = () => {
+            // Arahkan ke halaman pertanyaan pertama
+            window.location.href = 'ask_cia.html';
+        };
+    }
+
+
+    function gameLoop() {
+        if (gameOver) {
+            showResultSnake();
+            return;
+        }
+
+        setTimeout(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Gambar Makanan
+            ctx.drawImage(foodImg, food.x, food.y, tileSize, tileSize);
+
+            // Gerakkan Ular
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            snake.unshift(head);
+
+            // Cek makan
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+
+            // Cek tabrakan
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                gameOver = true;
+            }
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver = true;
+                }
+            }
+            
+            // Gambar Ular
+            snake.forEach((segment, index) => {
+                if (index === 0) {
+                    ctx.drawImage(headImg, segment.x, segment.y, tileSize, tileSize);
+                } else {
+                    ctx.fillStyle = '#87ceeb'; // Warna badan ular
+                    ctx.fillRect(segment.x, segment.y, tileSize, tileSize);
+                    ctx.strokeStyle = 'white';
+                    ctx.strokeRect(segment.x, segment.y, tileSize, tileSize);
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+
+        }, gameSpeed);
+    }
+
+    // Tunggu gambar dimuat
+    let imagesLoaded = 0;
+    [headImg, foodImg].forEach(img => {
+        img.onload = () => {
+            imagesLoaded++;
+            if (imagesLoaded === 2) {
+                generateFood();
+                gameLoop();
+            }
+        };
+    });
+
+</script>
+</body>
+</html>
