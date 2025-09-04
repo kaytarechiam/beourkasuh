@@ -2,14 +2,18 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pertanyaan Kedua...</title>
-    </head>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
     <div class="container">
         <h1>Pertanyaan Terakhir</h1>
-        <h2>Cia, mau jadi Kasuh-nya Kei?</h2>
-        <button onclick="kirimJawaban('kei', 'Mau')">Mau</button>
-        <button onclick="kirimJawaban('kei', 'Tidak Mau')">Tidak Mau</button>
+        <h2>Dan... mau jadi Kasuh-nya Kei juga?</h2>
+        <div>
+            <button onclick="kirimJawaban('kei', 'Mau')">Mau</button>
+            <button onclick="kirimJawaban('kei', 'Tidak Mau')" style="background-color: #aaa;">Tidak Mau</button>
+        </div>
     </div>
     <script src="ask_kei.js"></script>
 </body>

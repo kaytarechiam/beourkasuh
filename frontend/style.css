@@ -1,0 +1,139 @@
+/* --- Global Font --- */
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('fonts/PlusJakartaSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('fonts/PlusJakartaSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* --- Umum untuk Semua Halaman --- */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f0f8ff; /* AliceBlue - warna awan */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Pastikan konten memenuhi tinggi layar */
+    background-image: url('cinnamoroll_bg.png'); /* GANTI DENGAN GAMBAR LATAR BELAKANG CINNAMOROLLMU */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 500px;
+    margin: 20px; /* Tambahkan margin agar tidak terlalu mepet */
+    border: 3px solid #b0e0e6; /* Border biru pastel */
+}
+
+h1, h2 {
+    color: #ff69b4; /* HotPink - warna khas Cinnamoroll */
+    margin-bottom: 20px;
+}
+
+p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+    width: calc(100% - 22px); /* Sesuaikan padding */
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #b0e0e6; /* Biru pastel */
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1em;
+    box-sizing: border-box; /* Agar padding tidak menambah lebar total */
+}
+
+button {
+    padding: 12px 25px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #ff69b4; /* HotPink */
+    color: white;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #ff1493; /* DeepPink */
+}
+
+/* --- Spesifik Game --- */
+#gameContainer {
+    border: none; /* Border sudah ada di body container */
+    background-color: #f0f8ff; /* Latar belakang canvas */
+    border-radius: 15px;
+    overflow: hidden; /* Penting agar Cinnamoroll tidak keluar */
+}
+
+#gameOverScreen {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    border: 3px solid #b0e0e6;
+}
+#gameOverScreen h2 {
+    color: #ff69b4;
+}
+
+#lanjutButton {
+    background-color: #87ceeb; /* Biru langit */
+}
+#lanjutButton:hover {
+    background-color: #6495ed; /* CornflowerBlue */
+}
+
+/* --- Admin Panel --- */
+.profile-card {
+    background-color: rgba(240, 248, 255, 0.9); /* AliceBlue */
+    border: 2px solid #b0e0e6;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+    text-align: left;
+}
+.profile-card h3 {
+    color: #ff69b4;
+    font-size: 1.3em;
+}
+.schedule-info {
+    background-color: rgba(240, 248, 255, 0.9);
+    border: 2px solid #b0e0e6;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.schedule-info h3 {
+    color: #ff69b4;
+    font-size: 1.3em;
+}
+#adminResetButton {
+    background-color: #e57373; /* Merah pastel */
+}
+#adminResetButton:hover {
+    background-color: #ef5350; /* Merah */
+}
