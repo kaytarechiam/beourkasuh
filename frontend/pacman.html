@@ -10,7 +10,7 @@
             background-color: #000;
             border-radius: 15px;
             padding: 10px;
-            user-select: none; 
+            user-select: none;
             -webkit-user-select: none;
         }
         #pacmanInstructions {
@@ -48,7 +48,7 @@
     canvas.width = 15 * tileSize;
     canvas.height = 16 * tileSize;
 
-    // --- ASET GAMBAR ---
+    // Aset Gambar
     const playerImg = new Image();
     playerImg.src = 'cinnamoroll_player.png'; 
 
@@ -58,7 +58,7 @@
     const ghost2Img = new Image();
     ghost2Img.src = 'kei_ghost.png';
 
-    // --- PETA GAME ---
+    // Peta Game (0=kosong, 1=dinding, 2=koin)
     const map = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
@@ -78,7 +78,6 @@
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ];
 
-    // --- Variabel Game ---
     let player, ghosts, score, totalCoins, gameOver;
 
     function initializeGame() {
@@ -90,13 +89,10 @@
         score = 0;
         totalCoins = map.reduce((sum, row) => sum + row.filter(tile => tile === 2).length, 0);
         gameOver = false;
-
-        // Reset tampilan
         document.getElementById('gameContainerPacman').style.display = 'block';
         document.getElementById('pacmanResult').style.display = 'none';
     }
     
-    // --- KONTROL PEMAIN ---
     window.addEventListener('keydown', (e) => {
         e.preventDefault();
         switch(e.key) {
@@ -110,9 +106,7 @@
     function isWall(x, y) {
         const col = Math.floor(x / tileSize);
         const row = Math.floor(y / tileSize);
-        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) {
-            return true;
-        }
+        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
         return map[row][col] === 1;
     }
     
@@ -120,7 +114,6 @@
         gameOver = true;
         document.getElementById('gameContainerPacman').style.display = 'none';
         document.getElementById('pacmanResult').style.display = 'block';
-        
         const title = document.getElementById('resultTitle');
         const message = document.getElementById('resultMessage');
         const nextButton = document.getElementById('nextButton');
@@ -141,23 +134,27 @@
     function gameLoop() {
         if (gameOver) return;
 
-        // Logika Pergerakan Pemain
+        // --- Logika Pergerakan Pemain yang Diperbaiki ---
         const onGrid = (n) => n % tileSize === 0;
+        
+        // Cek jika bisa berbelok di persimpangan
         if (onGrid(player.x) && onGrid(player.y)) {
-            if (player.nextDx !== 0 || player.nextDy !== 0) {
-                if (!isWall(player.x + player.nextDx, player.y + player.nextDy)) {
-                    player.dx = player.nextDx;
-                    player.dy = player.nextDy;
-                    player.nextDx = 0;
-                    player.nextDy = 0;
-                }
+            let nextTurnX = player.x + player.nextDx;
+            let nextTurnY = player.y + player.nextDy;
+            if (!isWall(nextTurnX, nextTurnY)) {
+                player.dx = player.nextDx;
+                player.dy = player.nextDy;
             }
         }
 
-        if (onGrid(player.x) && onGrid(player.y) && isWall(player.x + player.dx, player.y + player.dy)) {
+        // Cek jika akan menabrak dinding di arah saat ini
+        let nextX = player.x + player.dx;
+        let nextY = player.y + player.dy;
+        if (onGrid(player.x) && onGrid(player.y) && isWall(nextX, nextY)) {
             player.dx = 0;
             player.dy = 0;
         }
+        
         player.x += player.dx;
         player.y += player.dy;
 
@@ -179,14 +176,22 @@
         
         // Gerakan & Cek Tabrakan Hantu
         ghosts.forEach(ghost => {
-            ghost.x += ghost.dx;
-            ghost.y += ghost.dy;
-            if (isWall(ghost.x, ghost.y) || isWall(ghost.x + tileSize - 1, ghost.y + tileSize - 1) || Math.random() < 0.05) {
+             // Gerakan hantu yang lebih simpel untuk mencegah bug
+            if (Math.random() < 0.05) { // 5% chance to change direction
                 const directions = [{dx: ghost.speed, dy: 0}, {dx: -ghost.speed, dy: 0}, {dx: 0, dy: ghost.speed}, {dx: 0, dy: -ghost.speed}];
                 const newDir = directions[Math.floor(Math.random() * directions.length)];
-                ghost.dx = newDir.dx;
-                ghost.dy = newDir.dy;
+                if (!isWall(ghost.x + newDir.dx, ghost.y + newDir.dy)) {
+                    ghost.dx = newDir.dx;
+                    ghost.dy = newDir.dy;
+                }
             }
+            if (isWall(ghost.x + ghost.dx, ghost.y + ghost.dy)) {
+                ghost.dx = -ghost.dx;
+                ghost.dy = -ghost.dy;
+            }
+            ghost.x += ghost.dx;
+            ghost.y += ghost.dy;
+            
             if (Math.hypot(player.x - ghost.x, player.y - ghost.y) < tileSize - 10) {
                 showResult(false);
             }
@@ -213,7 +218,6 @@
         requestAnimationFrame(gameLoop);
     }
     
-    // Tunggu semua gambar dimuat sebelum game dimulai
     let imagesLoaded = 0;
     const totalImages = 3;
     [playerImg, ghost1Img, ghost2Img].forEach(img => {
